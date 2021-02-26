@@ -1,0 +1,38 @@
+[
+    {
+        "enabled":  "true",
+        "number":  "1",
+        "name": "wh001",
+        "key":  "xxxxxxxxxxxxxx",
+        "secret":  "xxxxxxxxxxxxxx",
+        "profitPercent": 50,
+        "minRemainingBalance": 1000,
+        "maxMarginUsedPercent": 30,
+        "hours": 24,
+        "discord": "https://discord.com/api/webhooks/xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    {
+        "enabled":  "true",
+        "number":  "2",
+        "name": "wh002",
+        "key":  "xxxxxxxxxxxxxx",
+        "secret":  "xxxxxxxxxxxxxx",
+        "profitPercent": 50,
+        "minRemainingBalance": 1000,
+        "maxMarginUsedPercent": 30,
+        "hours": 24,
+        "discord": "https://discord.com/api/webhooks/xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    {
+        "enabled":  "true",
+        "number":  "3",
+        "name": "wh003",
+        "key":  "xxxxxxxxxxxxxx",
+        "secret":  "xxxxxxxxxxxxxx",
+        "profitPercent": 50,
+        "minRemainingBalance": 1000,
+        "maxMarginUsedPercent": 30,
+        "hours": 24,
+        "discord": "https://discord.com/api/webhooks/xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    }
+]
