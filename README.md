@@ -1,6 +1,7 @@
 # AutoTransfer
 
-![](https://i.imgur.com/Jue4pgc.png)
+![success](https://i.imgur.com/9onjx6s.png)
+![failure](https://i.imgur.com/Jue4pgc.png)
 
 ## What it does:
 - transfers profits automatically on multiple binance futures accounts
