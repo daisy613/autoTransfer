@@ -23,5 +23,5 @@
 - check for transfers within the past X hours when script starts, and don't transfer if found any.
 
 ## Tips:
-BTC: 199egmtTkcLVRHb2b88XBbQpyzM3pyVQw3
-ETH: 0xf22a12C4bA41951D7DCC266051D756d5cD4bA8E2
+- BTC: 199egmtTkcLVRHb2b88XBbQpyzM3pyVQw3
+- ETH: 0xf22a12C4bA41951D7DCC266051D756d5cD4bA8E2
