@@ -1,7 +1,9 @@
 # AutoTransfer
 
 ![success](https://i.imgur.com/spvFtax.png)
-![failure](https://i.imgur.com/Jue4pgc.png)
+
+![failure](https://i.imgur.com/ebXHmw2.png)
+
 ![discord](https://i.imgur.com/GcAIelz.png)
 
 ## What it does:
