@@ -1,6 +1,6 @@
 # AutoTransfer
 
-![success](https://i.imgur.com/XPJ6IDC.png)
+![success](https://i.imgur.com/ePQD0az.png)
 ![failure](https://i.imgur.com/Jue4pgc.png)
 
 ## What it does:
