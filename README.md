@@ -24,6 +24,7 @@
 - check for transfers within the past X hours when script starts, and don't transfer if found any.
 
 ## Tips:
-- BTC:          1PV97ppRdWeXw4TBXddAMNmwnknU1m37t5
+- BTC: 1PV97ppRdWeXw4TBXddAMNmwnknU1m37t5
 - ETH  (ERC20): 0x56b2239c6bde5dc1d155b98867e839ac502f01ad
+- USDT (TRC20): TNuwZebdZmoDxrJRxUbyqzG48H4KRDR7wB
 - USDT (ERC20): 0x56b2239c6bde5dc1d155b98867e839ac502f01ad
