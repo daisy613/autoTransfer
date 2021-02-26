@@ -1,8 +1,8 @@
 # AutoTransfer
 
-![success](https://i.imgur.com/spvFtax.png)
+![success](https://i.imgur.com/RrG82RK.png)
 
-![failure](https://i.imgur.com/ebXHmw2.png)
+![failure](https://i.imgur.com/7AtDANL.png)
 
 ![discord](https://i.imgur.com/GcAIelz.png)
 
