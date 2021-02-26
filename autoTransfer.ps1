@@ -8,10 +8,21 @@
 # - if any of the conditions are false, then send discord alert and try again once an hour
 # - sleep for X $hours and repeat ad infinitum
 
+$version = "v1.0.0"
 $path = Split-Path $MyInvocation.MyCommand.Path
 $accounts = (gc "$($path)\autoTransfer.json" | ConvertFrom-Json) | ? { $_.enabled -eq "true" }
 if (!($accounts)) { write-log "Cannot find autoTransfer.json file!" ; sleep 30 ; exit }
-write-host "`n`n`n`n`n`n`n`n"
+write-host "`n`n`n`n`n`n`n`n`n`n"
+
+function checkLatest () {
+    $repo = "daisy613/autoTransfer"
+    $releases = "https://api.github.com/repos/$repo/releases"
+    $latestTag = (Invoke-WebRequest $releases | ConvertFrom-Json)[0].tag_name
+    $youngerVer = ($version, $latestTag | Sort-Object)[-1]
+    if ($latestTag -and $version -ne $youngerVer) {
+        write-host "Your version of AutoTransfer [$($version)] is outdated. Newer version [$($latestTag)] is available here: https://github.com/$($repo)/releases/tag/$($latestTag)" -ForegroundColor Green
+    }
+}
 
 Function write-log {
     Param ([string]$logstring)
@@ -28,10 +39,10 @@ function betterSleep () {
         $hours = [math]::Round(($seconds / 3600),2)
         $secondsLeft = $doneDT.Subtract((Get-Date)).TotalSeconds
         $percent = ($seconds - $secondsLeft) / $seconds * 100
-        Write-Progress -Activity "$($message)" -Status "Sleeping $($hours) hours..." -SecondsRemaining $secondsLeft -PercentComplete $percent
+        Write-Progress -Activity "$($message)" -Status "Sleeping $($hours) hour(s)..." -SecondsRemaining $secondsLeft -PercentComplete $percent
         [System.Threading.Thread]::Sleep(500)
     }
-    Write-Progress -Activity "$($message)" -Status "Sleeping $($hours) hours..." -SecondsRemaining 0 -Completed
+    Write-Progress -Activity "$($message)" -Status "Sleeping $($hours) hour(s)..." -SecondsRemaining 0 -Completed
 }
 
 function getAccount () {
@@ -88,6 +99,7 @@ function transferFunds () {
     Param ($accountNum,$transferAmount)
     $key = ($accounts | Where-Object { $_.number -eq $accountNum }).key
     $secret = ($accounts | Where-Object { $_.number -eq $accountNum }).secret
+    $hours = ($accounts | Where-Object { $_.number -eq $accountNum }).hours
     $type = 2
     $asset = "USDT"
     $amount = $transferAmount
@@ -102,9 +114,9 @@ function transferFunds () {
     $headers.Add("X-MBX-APIKEY", $key)
     $tranId = (Invoke-RestMethod -Uri $uriopenorders -Headers $headers -Method Post).tranId
     write-log "Transfer Successful!"
-    write-log "account[$($accountNum)]  totalBalance[$($totalWalletBalance)]  CurrentUsedMargin[$([math]::Round(($marginUsedPercentCurr), 1))%]  $($hours)hoursProfit[$($profit)]  transferred[$($transferAmount)]  tranId[$($tranId)]"
+    write-log "account[$($accountNum)]  totalBalance[$($totalWalletBalance)]  CurrentUsedMargin[$([math]::Round($marginUsedPercentCurr,1))%]  $($hours)hoursProfit[$([math]::Round(($profit), 2))]  transferred[$([math]::Round(($transferAmount),2))]  tranId[$($tranId)]"
     ### send discord message
-    $message = "**TRANSFER**: SUCCESS  **account**: $($accountNum)  **totalBalance**: $($totalWalletBalance)  **$($hours)hoursProfit**: $($profit)  **transferred**: $($transferAmount)  **tranId**: $($tranId)"
+    $message = "**TRANSFER**: SUCCESS  **account**: $($accountNum)  **totalBalance**: $($totalWalletBalance)  **$($hours)hoursProfit**: $([math]::Round(($profit), 2))  **transferred**: $([math]::Round(($transferAmount),2))  **tranId**: $($tranId)"
     sendDiscord $accountNum $message
 }
 
