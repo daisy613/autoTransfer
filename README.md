@@ -7,7 +7,7 @@
 ![discord](https://i.imgur.com/GcAIelz.png)
 
 ## What it does:
-- transfers profits automatically on multiple binance futures accounts
+- transfers profits automatically on a single binance futures accounts (for multiple accounts, just create a new folder and run a new instance of the script from it).
 - if the following conditions are true:
   - marginUsedPercentCurr is < maxMarginUsedPercent
   - ($totalBalance - $percentsOfProfit/100 * $profit) is > minRemainingBalance
