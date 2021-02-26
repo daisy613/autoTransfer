@@ -7,7 +7,7 @@
 ![discord](https://i.imgur.com/GcAIelz.png)
 
 ## What it does:
-- this PowerShell script transfers profits automatically on a Binance Futures account, from Futures to Spot wallet, at a predefined interval (for multiple accounts, just create a new folder and run a new instance of the script from it, with a new autoTransfer.json file).
+- this PowerShell script transfers a percentage of profits automatically on a Binance Futures account, from Futures to Spot wallet, at a predefined interval (for multiple accounts, just create a new folder and run a new instance of the script from it, with a new autoTransfer.json file).
 - if the following conditions are true:
   - marginUsedPercentCurr is < maxMarginUsedPercent.
   - ($totalBalance - $percentsOfProfit/100 * $profit) is > minRemainingBalance.
