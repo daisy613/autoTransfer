@@ -15,3 +15,6 @@
 
 ## Instructions:
 - define in autoTransfer.json file the profitPercent you want transferred, minRemainingBalance, maxMarginUsedPercent, and period in hours
+
+## To do:
+- check for transfers within the past X hours when script starts, and don't transfer if found any.
