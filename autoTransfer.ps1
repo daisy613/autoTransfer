@@ -1,6 +1,9 @@
 ### Changelog:
-### * removed multi-account feature for the time being. Create a directory per each account and run a separate process for them.
-$version = "v1.0.1"
+### * fixed "Mandatory parameter 'amount' was not sent" error
+### * fixed "Invoke-WebRequest Fails with SSL/TLS Secure Channel" error
+
+$version = "v1.0.3"
+[Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls"
 $path = Split-Path $MyInvocation.MyCommand.Path
 $accountSettings = gc "$($path)\autoTransfer.json" -ea silentlyContinue | ConvertFrom-Json
 if (!($accountSettings)) { write-host "Cannot find autoTransfer.json file!" -foregroundcolor "DarkRed" -backgroundcolor "yellow"; sleep 30 ; exit }
@@ -122,10 +125,10 @@ while ($true) {
     $transferAmount = $accountSettings.profitPercent * $($profit) / 100
 
     ### check if used margin percentage is less than defined, and total remaining balance is more than defined. if conditions don't apply, retry once an hour
-    while (($marginUsedPercentCurr -gt $accountSettings.maxMarginUsedPercent) -or ($accountSettings.minRemainingBalance -gt ($totalWalletBalance - $transferAmount)) -or $profit -lt 0) {
-        write-log -string "account[$($accountSettings.name)] totalBalance[$($totalWalletBalance)] currentUsedMargin[$([math]::Round(($marginUsedPercentCurr), 1))%] $($accountSettings.hours)hoursProfit[$([math]::Round(($profit), 2))]" -color "Yellow"
+    while (($marginUsedPercentCurr -gt $accountSettings.maxMarginUsedPercent) -or ($accountSettings.minRemainingBalance -gt ($totalWalletBalance - $transferAmount)) -or $profit -le 0) {
+        write-log -string "account[$($accountSettings.name)] totalBalance[$($totalWalletBalance)] currentUsedMargin[$([math]::Round(($marginUsedPercentCurr), 1))%] $($accountSettings.hours)hourProfit[$([math]::Round(($profit), 2))]" -color "Yellow"
         write-log -string "Conditions not fulfilled. Waiting 1 hr to retry..." -color "Yellow"
-        $message = "**TRANSFER**: FAILURE  **account**: $($accountSettings.number)  **totalBalance**: $($totalWalletBalance)  **$($accountSettings.hours)hoursProfit**: $($profit)"
+        $message = "**TRANSFER**: FAILURE  **account**: $($accountSettings.number)  **totalBalance**: $($totalWalletBalance)  **$($accountSettings.hours)hourProfit**: $([math]::Round(($profit), 2))"
         sendDiscord $accountSettings.discord $message
         betterSleep 3600 "AutoTransfer Reattempt (conditions not fulfilled)"
         ### Get current account info and profit
@@ -140,9 +143,9 @@ while ($true) {
     ### perform the transfer of ($percentsOfProfit * $profit) to Spot
     $tranId = transferFunds $transferAmount
     write-log -string "Transfer Successful!" -color "Green"
-    write-log -string "account[$($accountSettings.name)] totalBalance[$($totalWalletBalance)] currentUsedMargin[$([math]::Round($marginUsedPercentCurr,1))%] $($accountSettings.hours)hoursProfit[$([math]::Round(($profit), 2))] transferred[$([math]::Round(($transferAmount),2))] tranId[$($tranId)]" -color "Green"
+    write-log -string "account[$($accountSettings.name)] totalBalance[$($totalWalletBalance)] currentUsedMargin[$([math]::Round($marginUsedPercentCurr,1))%] $($accountSettings.hours)hourProfit[$([math]::Round(($profit), 2))] transferred[$([math]::Round(($transferAmount),2))] tranId[$($tranId)]" -color "Green"
     ### send discord message
-    $message = "**TRANSFER**: SUCCESS  **account**: $($accountSettings.name)  **totalBalance**: $($totalWalletBalance)  **$($accountSettings.hours)hoursProfit**: $([math]::Round(($profit), 2))  **transferred**: $([math]::Round(($transferAmount),2))  **tranId**: $($tranId)"
+    $message = "**TRANSFER**: SUCCESS  **account**: $($accountSettings.name)  **totalBalance**: $($totalWalletBalance)  **$($accountSettings.hours)hourProfit**: $([math]::Round(($profit), 2))  **transferred**: $([math]::Round(($transferAmount),2))  **tranId**: $($tranId)"
     sendDiscord $accountSettings.discord $message
 
     ### sleep for $hours
