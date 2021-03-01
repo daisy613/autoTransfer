@@ -1,11 +1,11 @@
 ### Changelog:
-### * fixed "Mandatory parameter 'amount' was not sent" error
-### * fixed "Invoke-WebRequest Fails with SSL/TLS Secure Channel" error
+### * added version info to line timestamp display
+### * added current spot balance
 
 $version = "v1.0.3"
 [Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls"
 $path = Split-Path $MyInvocation.MyCommand.Path
-$accountSettings = gc "$($path)\autoTransfer.json" -ea silentlyContinue | ConvertFrom-Json
+$accountSettings = gc "$($path)\autoTransfer.json" | ConvertFrom-Json
 if (!($accountSettings)) { write-host "Cannot find autoTransfer.json file!" -foregroundcolor "DarkRed" -backgroundcolor "yellow"; sleep 30 ; exit }
 write-host "`n`n`n`n`n`n`n`n`n`n"
 
@@ -22,7 +22,7 @@ function checkLatest () {
 Function write-log {
     Param ([string]$string,$color)
     $Logfile = "$($path)\autoTransfer.log"
-    $date = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $date = Get-Date -Format "$($version) yyyy-MM-dd HH:mm:ss"
     Write-Host "[$date] $string" -ForegroundColor $color
     Add-Content $Logfile -Value "[$date] $string"
 }
@@ -40,7 +40,7 @@ function betterSleep () {
     Write-Progress -Activity "$($message)" -Status "Sleeping $($hours) hour(s)..." -SecondsRemaining 0 -Completed
 }
 
-function getAccount () {
+function getAccountFut () {
     $TimeStamp = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
     $QueryString = "&recvWindow=5000&timestamp=$TimeStamp"
     $hmacsha = New-Object System.Security.Cryptography.HMACSHA256
@@ -53,6 +53,22 @@ function getAccount () {
     $accountInformation = Invoke-RestMethod -Uri $uri -Headers $headers -Method Get
     return $accountInformation
 }
+
+function getAccountSpt () {
+    # /api/v3/account
+    $TimeStamp = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+    $QueryString = "&recvWindow=5000&timestamp=$TimeStamp"
+    $hmacsha = New-Object System.Security.Cryptography.HMACSHA256
+    $hmacsha.key = [Text.Encoding]::ASCII.GetBytes($accountSettings.secret)
+    $signature = $hmacsha.ComputeHash([Text.Encoding]::ASCII.GetBytes($QueryString))
+    $signature = [System.BitConverter]::ToString($signature).Replace('-', '').ToLower()
+    $uri = "https://api.binance.com/api/v3/account?$QueryString&signature=$signature"
+    $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+    $headers.Add("X-MBX-APIKEY", $accountSettings.key)
+    $accountInformation = Invoke-RestMethod -Uri $uri -Headers $headers -Method Get
+    return $accountInformation
+}
+
 
 function getProfit () {
     Param ($hours)
@@ -118,12 +134,11 @@ while ($true) {
     checkLatest
     ### Get current account info and profit
     $profit = getProfit $accountSettings.hours
-    $accountInformation = getAccount
+    $accountInformation = getAccountFut
     $totalWalletBalance = [math]::Round(($accountInformation.totalWalletBalance), 2)
     try { $marginUsedPercentCurr = (([decimal] $accountInformation.totalInitialMargin + [decimal] $accountInformation.totalMaintMargin) / $accountInformation.totalWalletBalance) * 100 }
     catch { $marginUsedPercentCurr = 100 }
     $transferAmount = $accountSettings.profitPercent * $($profit) / 100
-
     ### check if used margin percentage is less than defined, and total remaining balance is more than defined. if conditions don't apply, retry once an hour
     while (($marginUsedPercentCurr -gt $accountSettings.maxMarginUsedPercent) -or ($accountSettings.minRemainingBalance -gt ($totalWalletBalance - $transferAmount)) -or $profit -le 0) {
         write-log -string "account[$($accountSettings.name)] totalBalance[$($totalWalletBalance)] currentUsedMargin[$([math]::Round(($marginUsedPercentCurr), 1))%] $($accountSettings.hours)hourProfit[$([math]::Round(($profit), 2))]" -color "Yellow"
@@ -133,21 +148,20 @@ while ($true) {
         betterSleep 3600 "AutoTransfer Reattempt (conditions not fulfilled)"
         ### Get current account info and profit
         $profit = getProfit $accountSettings.hours
-        $accountInformation = getAccount
+        $accountInformation = getAccountFut
         $totalWalletBalance = [math]::Round(($accountInformation.totalWalletBalance), 2)
         try { $marginUsedPercentCurr = (([decimal] $accountInformation.totalInitialMargin + [decimal] $accountInformation.totalMaintMargin) / $accountInformation.totalWalletBalance) * 100 }
         catch { $marginUsedPercentCurr = 100 }
         $transferAmount = $accountSettings.profitPercent * $($profit) / 100
     }
-
     ### perform the transfer of ($percentsOfProfit * $profit) to Spot
     $tranId = transferFunds $transferAmount
+    $spotBalance = [math]::Round(((getAccountSpt).balances | ? { $_.asset -eq "USDT" }).free, 2)
     write-log -string "Transfer Successful!" -color "Green"
-    write-log -string "account[$($accountSettings.name)] totalBalance[$($totalWalletBalance)] currentUsedMargin[$([math]::Round($marginUsedPercentCurr,1))%] $($accountSettings.hours)hourProfit[$([math]::Round(($profit), 2))] transferred[$([math]::Round(($transferAmount),2))] tranId[$($tranId)]" -color "Green"
+    write-log -string "account[$($accountSettings.name)] totalBalance[$($totalWalletBalance)] currUsedMargin[$([math]::Round($marginUsedPercentCurr,1))%] $($accountSettings.hours)hourProfit[$([math]::Round(($profit), 2))] transferred[$([math]::Round(($transferAmount),2))] spotBalance[$($spotBalance)]" -color "Green"
     ### send discord message
-    $message = "**TRANSFER**: SUCCESS  **account**: $($accountSettings.name)  **totalBalance**: $($totalWalletBalance)  **$($accountSettings.hours)hourProfit**: $([math]::Round(($profit), 2))  **transferred**: $([math]::Round(($transferAmount),2))  **tranId**: $($tranId)"
+    $message = "**TRANSFER**: SUCCESS  **account**: $($accountSettings.name)  **totalBalance**: $($totalWalletBalance)  **$($accountSettings.hours)hourProfit**: $([math]::Round(($profit), 2))  **transferred**: $([math]::Round(($transferAmount),2))  **spotBalance**: $($spotBalance)"
     sendDiscord $accountSettings.discord $message
-
-    ### sleep for $hours
+    ### sleep for X $hours
     betterSleep ($accountSettings.hours * 3600) "AutoTransfer"
 }
