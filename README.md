@@ -4,6 +4,8 @@
 
 ![failure](https://i.imgur.com/7AtDANL.png)
 
+![restart](https://i.imgur.com/r5C35pS.png)
+
 ![discord](https://i.imgur.com/GcAIelz.png)
 
 ## What it does:
