@@ -1,8 +1,7 @@
 ### Changelog:
-### * added version info to line timestamp display
-### * added current spot balance
+### * added feature to check the time of last transfer and schedule the next transfer appropriately. This will allow user to restart the script without it performing a transfer immediately.
 
-$version = "v1.0.3"
+$version = "v1.0.4"
 [Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls"
 $path = Split-Path $MyInvocation.MyCommand.Path
 $accountSettings = gc "$($path)\autoTransfer.json" | ConvertFrom-Json
@@ -77,6 +76,10 @@ function getProfit () {
     $startTime = ([DateTimeOffset]$start).ToUnixTimeMilliseconds()
     $limit = "1000"    # max 1000
     $results = @()
+    $thing = [PSCustomObject]@{
+        lastTransTime = $null
+        profit       = $null
+    }
     while ($true) {
         $TimeStamp = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
         $QueryString = "&recvWindow=5000&limit=$limit&timestamp=$TimeStamp&startTime=$startTime"
@@ -93,10 +96,11 @@ function getProfit () {
         if ($result.length -lt 1000) { break }
         $startTime = [int64]($result.time | sort)[-1] + 1
     }
-    $results = $results | ? { $_.incomeType -ne "TRANSFER" }
     $sum = 0
-    $results | % { $sum += $_.income }
-    return $sum
+    $results | ? { $_.incomeType -ne "TRANSFER" } | % { $sum += $_.income }
+    $thing.lastTransTime = try { ($results | ? { $_.incomeType -eq "TRANSFER" } | sort time).time[-1] } catch { $null }
+    $thing.profit       = $sum
+    return $thing
 }
 
 # https://binance-docs.github.io/apidocs/spot/en/#new-future-account-transfer-user_data
@@ -133,7 +137,8 @@ function sendDiscord () {
 while ($true) {
     checkLatest
     ### Get current account info and profit
-    $profit = getProfit $accountSettings.hours
+    $profitQuery = getProfit $accountSettings.hours
+    $profit = $profitQuery.profit
     $accountInformation = getAccountFut
     $totalWalletBalance = [math]::Round(($accountInformation.totalWalletBalance), 2)
     try { $marginUsedPercentCurr = (([decimal] $accountInformation.totalInitialMargin + [decimal] $accountInformation.totalMaintMargin) / $accountInformation.totalWalletBalance) * 100 }
@@ -147,7 +152,8 @@ while ($true) {
         sendDiscord $accountSettings.discord $message
         betterSleep 3600 "AutoTransfer Reattempt (conditions not fulfilled)"
         ### Get current account info and profit
-        $profit = getProfit $accountSettings.hours
+        $profitQuery = getProfit $accountSettings.hours
+        $profit = $profitQuery.profit
         $accountInformation = getAccountFut
         $totalWalletBalance = [math]::Round(($accountInformation.totalWalletBalance), 2)
         try { $marginUsedPercentCurr = (([decimal] $accountInformation.totalInitialMargin + [decimal] $accountInformation.totalMaintMargin) / $accountInformation.totalWalletBalance) * 100 }
@@ -155,7 +161,15 @@ while ($true) {
         $transferAmount = $accountSettings.profitPercent * $($profit) / 100
     }
     ### perform the transfer of ($percentsOfProfit * $profit) to Spot
-    $tranId = transferFunds $transferAmount
+    if (!($profitQuery.lastTransTime)) {
+        $tranId = transferFunds $transferAmount
+    }
+    else {
+        $delay  = ($accountSettings.hours * 3600000) - ([DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds() - $profitQuery.lastTransTime)
+        $hrsAgo = [math]::Round((($accountSettings.hours * 3600000) - $delay) / 3600000, 2)
+        write-log "A transfer has been performed $($hrsAgo) hours ago. Scheduling the next transfer to run in $([math]::Round(($delay / 3600000), 2)) hours ..." -color "Magenta"
+        betterSleep ($delay / 1000) "AutoTransfer"
+    }
     $spotBalance = [math]::Round(((getAccountSpt).balances | ? { $_.asset -eq "USDT" }).free, 2)
     write-log -string "Transfer Successful!" -color "Green"
     write-log -string "account[$($accountSettings.name)] totalBalance[$($totalWalletBalance)] currUsedMargin[$([math]::Round($marginUsedPercentCurr,1))%] $($accountSettings.hours)hourProfit[$([math]::Round(($profit), 2))] transferred[$([math]::Round(($transferAmount),2))] spotBalance[$($spotBalance)]" -color "Green"
