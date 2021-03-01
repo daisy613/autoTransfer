@@ -4,7 +4,7 @@
 
 ![failure](https://i.imgur.com/7AtDANL.png)
 
-![restart](https://i.imgur.com/r5C35pS.png)
+![restart](https://i.imgur.com/H8EUUEw.png)
 
 ![discord](https://i.imgur.com/GcAIelz.png)
 
