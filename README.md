@@ -22,11 +22,11 @@
 
 ## Instructions:
 - define the following in autoTransfer.json file
-  - profitPercent: the percentage of the profit of the past X hours you want transferred
-  - minRemainingBalance: minimum remaining balance after the transfer.
-  - maxMarginUsedPercent: maximum used margin above which transfers should not occur.
-  - hours: the period in hours of how often to perform transfers.
-  - proxy: IP proxy and port to use (example "http://25.12.124.35:2763"). Leave blank if no proxy used (""). Get proxy IPs [here](https://www.webshare.io/?referral_code=wn3nlqpeqog7).
+  - **profitPercent**: the percentage of the profit of the past X hours you want transferred
+  - **minRemainingBalance**: minimum remaining balance after the transfer.
+  - **maxMarginUsedPercent**: maximum used margin above which transfers should not occur.
+  - **hours**: the period in hours of how often to perform transfers.
+  - **proxy**: IP proxy and port to use (example "http://25.12.124.35:2763"). Leave blank if no proxy used (""). Get proxy IPs [here](https://www.webshare.io/?referral_code=wn3nlqpeqog7).
 - submit any issues or enhancement ideas on the [Issues](https://github.com/daisy613/autoTransfer/issues) page.
 
 ## Tips:
