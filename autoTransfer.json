@@ -1,14 +1,13 @@
 [
-    [
-        {
-            "name": "wh001",
-            "key":  "xxxxxxxxxxxxxxxxxxxx",
-            "secret":  "xxxxxxxxxxxxxxxxxxxx",
-            "profitPercent": 50,
-            "minRemainingBalance": 2000,
-            "maxMarginUsedPercent": 30,
-            "hours": 24,
-            "discord": "https://discord.com/api/webhooks/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        }
-    ]
+    {
+        "name": "wh009",
+        "key":  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "secret":  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "profitPercent": 50,
+        "minRemainingBalance": 1000,
+        "maxMarginUsedPercent": 30,
+        "hours": 1,
+        "proxy": "http://PROXYIP:PROXYPORT",
+        "discord": "https://discord.com/api/webhooks/yyyyyyyyyyyyyyyyyyyyyyyyy/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    }
 ]
