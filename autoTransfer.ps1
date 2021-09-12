@@ -176,7 +176,7 @@ while ($true) {
         $failureReasons = [string]$failureReasons
         write-log -string "account[$($settings.name)] totalBalance[$($totalWalletBalance)] currentUsedMargin[$([math]::Round(($marginUsedPercentCurr), 1))%] $($settings.hours)hourProfit[$([math]::Round(($profit), 2))]" -color "Yellow"
         write-log -string "Conditions not fulfilled [$($failureReasons)]. Waiting 1 hr to retry..." -color "Yellow"
-        $message = "**TRANSFER**: FAILURE  **account**: $($settings.number)  **totalBalance**: $($totalWalletBalance)  **$($settings.hours)hourProfit**: $([math]::Round(($profit), 2))"
+        $message = "**TRANSFER**: FAILURE  **account**: $($settings.name)  **totalBalance**: $($totalWalletBalance)  **$($settings.hours)hourProfit**: $([math]::Round(($profit), 2))"
         sendDiscord $settings.discord $message
         betterSleep 3600 "AutoTransfer $($version) (path: $($path)) - reattempting in 1hr (conditions not fulfilled)"
         ### Get current account info and profit
