@@ -206,7 +206,7 @@ while ($true) {
     write-log -string "Transfer Successful!" -color "Green"
     write-log -string "account[$($settings.name)] totalBalance[$($totalWalletBalance)] currUsedMargin[$([math]::Round($marginUsedPercentCurr,1))%] $($settings.hours)hourProfit[$([math]::Round(($profit), 2))] transferred[$([math]::Round(($transferAmount),2))] spotBalance[$($spotBalance)]" -color "Green"
     ### send discord message
-    $message = "**TRANSFER**: SUCCESS  **account**: $($settings.name)  **maxUsedMargin**: $([math]::Round(($marginUsedPercentMax), 2))  **currentUsedMargin**: $([math]::Round(($marginUsedPercentCurr), 2))  **totalBalance**: $($totalWalletBalance)  **$($settings.hours)hourProfit**: $([math]::Round(($profit), 2))  **transferred**: $([math]::Round(($transferAmount),2))  **spotBalance**: $($spotBalance)"
+    $message = "**TRANSFER**: SUCCESS  **account**: $($settings.name)  **maxUsedMargin**: $([math]::Round(($marginUsedPercentMax), 2))  **currentUsedMargin**: $([math]::Round(($marginUsedPercentCurr), 2))  **totalBalance**: $($totalWalletBalance)  **$($settings.hours)-hourProfit**: $([math]::Round(($profit), 2))  **transferred**: $([math]::Round(($transferAmount),2)) ($($settings.profitPercent)%)  **spotBalance**: $($spotBalance)"
     sendDiscord $settings.discord $message
     ### sleep for X $hours
     betterSleep ($settings.hours * 3600) "AutoTransfer $($version) (path: $($path))"
