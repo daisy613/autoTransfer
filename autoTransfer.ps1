@@ -162,11 +162,11 @@ while ($true) {
     while (($marginUsedPercentMax -gt $settings.maxMarginUsedPercent) -or ($settings.minRemainingBalance -gt ($totalWalletBalance - $transferAmount)) -or $profit -le 0) {
         $failureReasons = @()
         if ($marginUsedPercentMax -gt $settings.maxMarginUsedPercent) {
-            $reason = "MAX_MARGIN_EXCEEDED"
+            $reason = "MAX_MARGIN_EXCEEDED, threshold: $($settings.maxMarginUsedPercent)"
             $failureReasons += $reason
         }
         elseif ($settings.minRemainingBalance -gt ($totalWalletBalance - $transferAmount)) {
-            $reason = "MIN_BALANCE_EXCEEDED"
+            $reason = "MIN_BALANCE_EXCEEDED, threshold: $($settings.minRemainingBalance)"
             $failureReasons += $reason
         }
         elseif ($profit -le 0) {
@@ -176,9 +176,9 @@ while ($true) {
         # if ($failureReasons.length -gt 1) { $failureReasons = $failureReasons -join ' ,' }
         $ofs = ', '
         $failureReasons = [string]$failureReasons
-        write-log -string "account[$($settings.name)] totalBalance[$($totalWalletBalance)] maxUsedMargin[$([math]::Round(($marginUsedPercentMax), 2))%] currentUsedMargin[$([math]::Round(($marginUsedPercentCurr), 2))%] $($settings.hours)hourProfit[$([math]::Round(($profit), 2))]" -color "Yellow"
+        write-log -string "account[$($settings.name)] totalBalance[$($totalWalletBalance)] maxUsedMargin[$([math]::Round(($marginUsedPercentMax), 2))%] currentUsedMargin[$([math]::Round(($marginUsedPercentCurr), 2))%] $($settings.hours)-hourProfit[$([math]::Round(($profit), 2))]" -color "Yellow"
         write-log -string "Conditions not fulfilled [$($failureReasons)]. Waiting 1 hr to retry..." -color "Yellow"
-        $message = "**TRANSFER**: FAILURE  **account**: $($settings.name)  **maxUsedMargin**: $([math]::Round(($marginUsedPercentMax), 2))  **currentUsedMargin**: $([math]::Round(($marginUsedPercentCurr), 2))  **totalBalance**: $($totalWalletBalance)  **$($settings.hours)hourProfit**: $([math]::Round(($profit), 2)) **failureReason**: $($failureReasons)"
+        $message = "**TRANSFER**: FAILURE  **account**: $($settings.name)  **maxUsedMargin**: $([math]::Round(($marginUsedPercentMax), 2))  **currentUsedMargin**: $([math]::Round(($marginUsedPercentCurr), 2))  **totalBalance**: $($totalWalletBalance)  **$($settings.hours)-hourProfit**: $([math]::Round(($profit), 2)) **failureReason**: $($failureReasons)"
         sendDiscord $settings.discord $message
         betterSleep 3600 "AutoTransfer $($version) (path: $($path)) - reattempting in 1hr (conditions not fulfilled)"
         ### Get current account info and profit
@@ -204,7 +204,7 @@ while ($true) {
     }
     $spotBalance = [math]::Round(((getAccountSpt).balances | ? { $_.asset -eq "USDT" }).free, 2)
     write-log -string "Transfer Successful!" -color "Green"
-    write-log -string "account[$($settings.name)] totalBalance[$($totalWalletBalance)] currUsedMargin[$([math]::Round($marginUsedPercentCurr,1))%] $($settings.hours)hourProfit[$([math]::Round(($profit), 2))] transferred[$([math]::Round(($transferAmount),2))] spotBalance[$($spotBalance)]" -color "Green"
+    write-log -string "account[$($settings.name)] totalBalance[$($totalWalletBalance)] currUsedMargin[$([math]::Round($marginUsedPercentCurr,1))%] $($settings.hours)-hourProfit[$([math]::Round(($profit), 2))] transferred[$([math]::Round(($transferAmount),2))] spotBalance[$($spotBalance)]" -color "Green"
     ### send discord message
     $message = "**TRANSFER**: SUCCESS  **account**: $($settings.name)  **maxUsedMargin**: $([math]::Round(($marginUsedPercentMax), 2))  **currentUsedMargin**: $([math]::Round(($marginUsedPercentCurr), 2))  **totalBalance**: $($totalWalletBalance)  **$($settings.hours)-hourProfit**: $([math]::Round(($profit), 2))  **transferred**: $([math]::Round(($transferAmount),2)) ($($settings.profitPercent)%)  **spotBalance**: $($spotBalance)"
     sendDiscord $settings.discord $message
