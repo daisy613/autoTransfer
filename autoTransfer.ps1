@@ -154,7 +154,7 @@ while ($true) {
     $totalWalletBalance = [math]::Round(($accountInformation.totalWalletBalance), 2)
     try { $marginUsedPercentMax = (([decimal] $accountInformation.totalInitialMargin + [decimal] $accountInformation.totalMaintMargin) / $accountInformation.totalWalletBalance) * 100 }
 	catch { $marginUsedPercentMax = 100 }
-	try { $marginUsedPercentCurr = (([decimal] $accountInformation.totalMaintMargin) / $accountInformation.totalWalletBalance) * 100 }
+	try { $marginUsedPercentCurr = (([decimal] $accountInformation.totalMaintMargin) / $accountInformation.totalMarginBalance) * 100 }
     catch { $marginUsedPercentCurr = 100 }
     $transferAmount = $settings.profitPercent * $($profit) / 100
     write-log -string "current settings: maxMarginUsedPercent[$($settings.maxMarginUsedPercent)] minRemainingBalance[$($settings.minRemainingBalance)] profitPercent[$($settings.profitPercent)] periodInHours[$($settings.hours)]" -color "Cyan"
@@ -188,7 +188,7 @@ while ($true) {
         $totalWalletBalance = [math]::Round(($accountInformation.totalWalletBalance), 2)
         try { $marginUsedPercentMax = (([decimal] $accountInformation.totalInitialMargin + [decimal] $accountInformation.totalMaintMargin) / $accountInformation.totalWalletBalance) * 100 }
 		catch { $marginUsedPercentMax = 100 }
-		try { $marginUsedPercentCurr = (([decimal] $accountInformation.totalMaintMargin) / $accountInformation.totalWalletBalance) * 100 }
+		try { $marginUsedPercentCurr = (([decimal] $accountInformation.totalMaintMargin) / $accountInformation.totalMarginBalance) * 100 }
         catch { $marginUsedPercentCurr = 100 }
         $transferAmount = $settings.profitPercent * $($profit) / 100
     }
