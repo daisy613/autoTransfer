@@ -178,7 +178,7 @@ while ($true) {
         $failureReasons = [string]$failureReasons
         write-log -string "account[$($settings.name)] totalBalance[$($totalWalletBalance)] maxUsedMargin[$([math]::Round(($marginUsedPercentMax), 2))%] currentUsedMarginRatio[$([math]::Round(($marginRatioUsedPercentCurr), 2))%] $($settings.hours)-hourProfit[$([math]::Round(($profit), 2))]" -color "Yellow"
         write-log -string "Conditions not fulfilled [$($failureReasons)]. Waiting 1 hr to retry..." -color "Yellow"
-        $message = "**TRANSFER**: FAILURE  **account**: $($settings.name)  **maxUsedMargin**: $([math]::Round(($marginUsedPercentMax), 2))  **currentUsedMarginRatio**: $([math]::Round(($marginRatioUsedPercentCurr), 2))  **totalBalance**: $($totalWalletBalance)  **$($settings.hours)-hourProfit**: $([math]::Round(($profit), 2)) **failureReason**: $($failureReasons)"
+        $message = "**TRANSFER**: FAILURE  **account**: $($settings.name)  **maxUsedMargin**: $([math]::Round(($marginUsedPercentMax), 2))  **currentUsedMarginRatio**: $([math]::Round(($marginRatioUsedPercentCurr), 2))  **uPNL**: $([math]::Round(($accountInformation.totalUnrealizedProfit), 2))  **totalBalance**: $($totalWalletBalance)  **$($settings.hours)-hourProfit**: $([math]::Round(($profit), 2)) **failureReason**: $($failureReasons)"
         sendDiscord $settings.discord $message
         betterSleep 3600 "AutoTransfer $($version) (path: $($path)) - reattempting in 1hr (conditions not fulfilled)"
         ### Get current account info and profit
