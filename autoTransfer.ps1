@@ -178,7 +178,7 @@ while ($true) {
         $failureReasons = [string]$failureReasons
         write-log -string "account[$($settings.name)] totalBalance[$($totalWalletBalance)] maxUsedMargin[$([math]::Round(($marginUsedPercentMax), 2))%] currentUsedMarginRatio[$([math]::Round(($marginRatioUsedPercentCurr), 2))%] $($settings.hours)-hourProfit[$([math]::Round(($profit), 2))]" -color "Yellow"
         write-log -string "Conditions not fulfilled [$($failureReasons)]. Waiting 1 hr to retry..." -color "Yellow"
-        $message = "**TRANSFER**: FAILURE  **account**: $($settings.name)  **maxUsedMargin**: $([math]::Round(($marginUsedPercentMax), 2))  **currentUsedMarginRatio**: $([math]::Round(($marginRatioUsedPercentCurr), 2))  **uPNL**: $([math]::Round(($accountInformation.totalUnrealizedProfit), 2))  **totalBalance**: $($totalWalletBalance)  **$($settings.hours)-hourProfit**: $([math]::Round(($profit), 2)) **failureReason**: $($failureReasons)"
+        $message = "**TRANSFER**: FAILURE  **account**: $($settings.name)  **maxUsedMargin**: $([math]::Round(($marginUsedPercentMax), 2))  **currentUsedMarginRatio**: $([math]::Round(($marginRatioUsedPercentCurr), 2))  **uPNL**: $([math]::Round(($accountInformation.totalUnrealizedProfit), 2))  **totalBalance**: $($totalWalletBalance)  **$($settings.hours)-hourProfit**: $([math]::Round(($profit), 2))  **failureReason**: $($failureReasons)"
         sendDiscord $settings.discord $message
         betterSleep 3600 "AutoTransfer $($version) (path: $($path)) - reattempting in 1hr (conditions not fulfilled)"
         ### Get current account info and profit
@@ -206,7 +206,7 @@ while ($true) {
     write-log -string "Transfer Successful!" -color "Green"
     write-log -string "account[$($settings.name)] totalBalance[$($totalWalletBalance)] currUsedMarginRatio[$([math]::Round($marginRatioUsedPercentCurr,1))%] $($settings.hours)-hourProfit[$([math]::Round(($profit), 2))] transferred[$([math]::Round(($transferAmount),2))] spotBalance[$($spotBalance)]" -color "Green"
     ### send discord message
-    $message = "**TRANSFER**: SUCCESS  **account**: $($settings.name)  **maxUsedMargin**: $([math]::Round(($marginUsedPercentMax), 2))  **currentUsedMarginRatio**: $([math]::Round(($marginRatioUsedPercentCurr), 2))  **totalBalance**: $($totalWalletBalance)  **$($settings.hours)-hourProfit**: $([math]::Round(($profit), 2))  **transferred**: $([math]::Round(($transferAmount),2)) ($($settings.profitPercent)%)  **spotBalance**: $($spotBalance)"
+    $message = "**TRANSFER**: SUCCESS  **account**: $($settings.name)  **maxUsedMargin**: $([math]::Round(($marginUsedPercentMax), 2))  **currentUsedMarginRatio**: $([math]::Round(($marginRatioUsedPercentCurr), 2))  **uPNL**: $([math]::Round(($accountInformation.totalUnrealizedProfit), 2))  **totalBalance**: $($totalWalletBalance)  **$($settings.hours)-hourProfit**: $([math]::Round(($profit), 2))  **transferred**: $([math]::Round(($transferAmount),2)) ($($settings.profitPercent)%)  **spotBalance**: $($spotBalance)"
     sendDiscord $settings.discord $message
     ### sleep for X $hours
     betterSleep ($settings.hours * 3600) "AutoTransfer $($version) (path: $($path))"
