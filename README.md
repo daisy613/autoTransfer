@@ -12,8 +12,8 @@
 ## What it does:
 - this PowerShell script continuously transfers a percentage of profits automatically on a Binance Futures account, from Futures to Spot wallet, at a predefined interval.
 - if the following conditions are true:
-  - Currently used margin is less than the defined maximum (marginUsedPercentCurr < maxMarginUsedPercent)
-  - The the remaining balance after the trasfer is more than the defined minimum remaining balance (($totalBalance - $percentsOfProfit/100 * $profit) is > minRemainingBalance)
+  - Current used margin (open orders are taken into account here) is less than the defined maximum (marginUsedPercentMax < maxMarginUsedPercent from the json file)
+  - The remaining balance after the transfer is more than the defined minimum remaining balance (($totalBalance - $percentsOfProfit/100 * $profit) is > minRemainingBalance)
   - profit in the past X hours is positive.
 - checks for transfers within the past X hours when script starts, and doesn't perform a transfer if found any.
 - transfers the defined percentage of the profit ($percentsOfProfit * $profit) to Spot and sends Discord message.
@@ -23,9 +23,9 @@
 ## Instructions:
 - drop the script file and the json settings file into the same folder with your bot.
 - define the following in autoTransfer.json file
-  - **profitPercent**: the percentage of the profit of the past X hours you want transferred
+  - **profitPercent**: the percentage of the profit of the past X hours you want transferred.
   - **minRemainingBalance**: minimum remaining balance after the transfer.
-  - **maxMarginUsedPercent**: maximum used margin above which transfers should not occur.
+  - **maxMarginUsedPercent**: maximum used margin above which transfers should not occur (this includes the open orders).
   - **hours**: the period in hours of how often to perform transfers.
   - **proxy**: (optional) IP proxy and port to use (example "http://25.12.124.35:2763"). Leave blank if no proxy used (""). Get proxy IPs [here](https://www.webshare.io/?referral_code=wn3nlqpeqog7).
 - submit any issues or enhancement ideas on the [Issues](https://github.com/daisy613/autoTransfer/issues) page.
